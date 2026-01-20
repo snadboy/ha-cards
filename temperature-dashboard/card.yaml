@@ -1,0 +1,176 @@
+# Home Assistant Grid-wrapped ApexCharts Card - Temperature & Furnace Dashboard
+#
+# This card shows:
+# - Line graphs for Dining Room, Office, Living Room, Family Room, Laundry Room, and Bedroom temperatures
+# - Background color changes to orange when heating, blue when cooling
+# - Target temperature setpoint line
+#
+# Requirements:
+# - ApexCharts Card installed via HACS (https://github.com/RomRider/apexcharts-card)
+#
+# Note: The Grid wrapper is required for proper width scaling in Section-based dashboards
+#
+# To add this card:
+# 1. Open your HA dashboard
+# 2. Click "Edit Dashboard" (pencil icon)
+# 3. Click "Add Card" -> "Manual"
+# 4. Paste the YAML below (starting from "type:")
+
+type: grid
+columns: 1
+square: false
+cards:
+  - type: custom:apexcharts-card
+    header:
+      show: true
+      title: Temperature & Furnace Activity
+      show_states: false
+      colorize_states: true
+    graph_span: 6h
+    yaxis:
+      - id: temp
+        min: 60
+        max: 85
+        decimals: 0
+        apex_config:
+          title:
+            text: "°F"
+    apex_config:
+      chart:
+        height: 350px
+      legend:
+        show: true
+        position: bottom
+        itemMargin:
+          horizontal: 15
+      stroke:
+        width: 2
+      fill:
+        type: solid
+    series:
+      # Heating background (orange)
+      - entity: climate.dining_room
+        name: Heating
+        type: area
+        curve: stepline
+        yaxis_id: temp
+        color: "rgba(255, 165, 0, 0.3)"
+        opacity: 1
+        stroke_width: 0
+        transform: "return x === 'heating' ? 85 : 60;"
+        attribute: hvac_action
+        extend_to: now
+        group_by:
+          func: raw
+          duration: 1min
+        show:
+          in_header: false
+          in_legend: false
+          legend_value: false
+      # Cooling background (blue)
+      - entity: climate.dining_room
+        name: Cooling
+        type: area
+        curve: stepline
+        yaxis_id: temp
+        color: "rgba(66, 165, 245, 0.3)"
+        opacity: 1
+        stroke_width: 0
+        transform: "return x === 'cooling' ? 85 : 60;"
+        attribute: hvac_action
+        extend_to: now
+        group_by:
+          func: raw
+          duration: 1min
+        show:
+          in_header: false
+          in_legend: false
+          legend_value: false
+      # Target Temperature (thermostat setpoint)
+      - entity: climate.dining_room
+        name: Target
+        type: line
+        curve: stepline
+        yaxis_id: temp
+        color: "#FFFFFF"
+        stroke_width: 1
+        float_precision: 1
+        unit: "°F"
+        attribute: temperature
+        extend_to: now
+        group_by:
+          func: raw
+          duration: 1min
+      # Dining Room Temperature (from Nest thermostat)
+      - entity: climate.dining_room
+        name: Dining Room
+        type: line
+        yaxis_id: temp
+        color: "#E91E63"
+        stroke_width: 2
+        float_precision: 1
+        attribute: current_temperature
+        extend_to: now
+        group_by:
+          func: avg
+          duration: 5min
+      # Office Temperature
+      - entity: sensor.office_hygro_temperature
+        name: Office
+        type: line
+        yaxis_id: temp
+        color: "#2196F3"
+        stroke_width: 2
+        float_precision: 1
+        extend_to: now
+        group_by:
+          func: avg
+          duration: 5min
+      # Living Room Temperature
+      - entity: sensor.living_room_hygro_temperature
+        name: Living Room
+        type: line
+        yaxis_id: temp
+        color: "#4CAF50"
+        stroke_width: 2
+        float_precision: 1
+        extend_to: now
+        group_by:
+          func: avg
+          duration: 5min
+      # Family Room Temperature
+      - entity: sensor.family_room_hygro_temperature
+        name: Family Room
+        type: line
+        yaxis_id: temp
+        color: "#9C27B0"
+        stroke_width: 2
+        float_precision: 1
+        extend_to: now
+        group_by:
+          func: avg
+          duration: 5min
+      # Laundry Room Temperature
+      - entity: sensor.laundry_hygro_temperature
+        name: Laundry Room
+        type: line
+        yaxis_id: temp
+        color: "#00BCD4"
+        stroke_width: 2
+        float_precision: 1
+        extend_to: now
+        group_by:
+          func: avg
+          duration: 5min
+      # Bedroom Temperature
+      - entity: sensor.bedroom_temperature
+        name: Bedroom
+        type: line
+        yaxis_id: temp
+        color: "#FF5722"
+        stroke_width: 2
+        float_precision: 1
+        extend_to: now
+        group_by:
+          func: avg
+          duration: 5min
