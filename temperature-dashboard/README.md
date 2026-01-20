@@ -40,6 +40,8 @@ Update the following entities to match your setup:
 4. Click "Add Card" → "Manual"
 5. Paste the contents of `card.yaml` (starting from `type:`)
 
+> **Note:** The card is wrapped in a `grid` container. This is required for proper width scaling in Section-based dashboards. Without the grid wrapper, the chart won't expand to fill the section width.
+
 ## Customization
 
 ### Colors
